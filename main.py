@@ -1,34 +1,22 @@
-import pycom
 import time
-from machine import Pin
-from machine import I2C
+from machine import Pin, I2C
 import VL53L0X
 
-i2c = I2C(0)
-i2c = I2C(0, I2C.MASTER)
-i2c = I2C(0, pins=('P10','P9'))
-i2c.init(I2C.MASTER, baudrate=9600)
+sdaPIN=Pin(14)
+sclPIN=Pin(15)
+i2c_bus = I2C(0, sda=sdaPIN, scl=sclPIN, freq=10000)
+time.sleep(0.1)
 
 # Create a VL53L0X object
-tof = VL53L0X.VL53L0X(i2c)
+tof = VL53L0X.VL53L0X(i2c_bus)
 
-tof.set_Vcsel_pulse_period(tof.vcsel_period_type[0], 18)
-
-tof.set_Vcsel_pulse_period(tof.vcsel_period_type[1], 14)
+tof.set_Vcsel_pulse_period(VL53L0X.PRE_RANGE_TYPE, 12)
+tof.set_Vcsel_pulse_period(VL53L0X.FINAL_RANGE_TYPE, 14)
 
 
 while True:
 # Start ranging
     tof.start()
-    tof.read()
-    print(tof.read())
+    distance = tof.read()
+    print(distance)
     tof.stop()
-
-
-
-
-
-
-    #q = tof.set_signal_rate_limit(0.1)
-    #
-    # time.sleep(0.1)
